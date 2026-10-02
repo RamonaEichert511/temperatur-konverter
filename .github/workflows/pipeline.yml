@@ -54,7 +54,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
-
+    permissions:
+      contents: write
+      actions: read
     steps:
       - name: Anwendungspaket herunterladen
         uses: actions/download-artifact@v4
@@ -82,3 +84,15 @@ jobs:
             exit 1
           fi
           echo "Übungs-Secret vorhanden; sein Wert wird nicht ausgegeben."
+      - name: GitHub Release erstellen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: v1.0.${{ github.run_number }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          gh release create "$RELEASE_VERSION" \
+            build/temperatur-konverter.zip \
+            --target "$RELEASE_COMMIT" \
+            --title "Temperaturkonverter $RELEASE_VERSION" \
+            --notes "Automatisch veröffentlicht nach erfolgreichen Tests und Environment-Freigabe."
