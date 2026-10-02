@@ -1,0 +1,31 @@
+name: Temperaturkonverter CI/CD
+
+on:
+  push:
+  pull_request:
+
+env:
+  PYTHON_VERSION: "3.12"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Anwendung testen
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository-Code holen
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Abhängigkeiten installieren
+        run: python -m pip install -r requirements.txt
+
+      - name: Tests ausführen
+        run: python -m pytest -v
