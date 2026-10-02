@@ -24,8 +24,27 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Python-Pakete zwischenspeichern
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Abhängigkeiten installieren
         run: python -m pip install -r requirements.txt
 
       - name: Tests ausführen
         run: python -m pytest -v
+
+      - name: Anwendung paketieren
+        run: |
+          mkdir -p build
+          python -m zipfile -c build/temperatur-konverter.zip src/ README.md requirements.txt
+      - name: Anwendungspaket hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: temperatur-konverter-paket
+          path: build/temperatur-konverter.zip
+          if-no-files-found: error
