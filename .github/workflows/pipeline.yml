@@ -49,9 +49,11 @@ jobs:
           path: build/temperatur-konverter.zip
           if-no-files-found: error
   deploy:
-    name: Anwendungspaket übernehmen
+    name: Geschütztes Deployment vorbereiten
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Anwendungspaket herunterladen
@@ -64,3 +66,19 @@ jobs:
         run: |
           ls -lh build/
           python -m zipfile -l build/temperatur-konverter.zip
+
+      - name: Deployment-Ziel anzeigen
+        env:
+          DEPLOY_TARGET: ${{ vars.DEPLOY_TARGET }}
+        run: |
+          echo "Deployment-Ziel: $DEPLOY_TARGET"
+
+      - name: Übungs-Secret prüfen
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$DEPLOY_TOKEN" ]; then
+            echo "Fehler: DEPLOY_TOKEN fehlt."
+            exit 1
+          fi
+          echo "Übungs-Secret vorhanden; sein Wert wird nicht ausgegeben."
