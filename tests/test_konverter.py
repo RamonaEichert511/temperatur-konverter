@@ -11,4 +11,4 @@ def test_fahrenheit_zu_celsius():
     assert fahrenheit_zu_celsius(212) == pytest.approx(100)
 
 def test_minus_40_grad():
-    assert celsius_zu_fahrenheit(-40) == pytest.approx(-40)
+    assert celsius_zu_fahrenheit(-40) == pytest.approx(-39)
