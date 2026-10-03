@@ -21,8 +21,9 @@ Die Anwendung stellt Python-Funktionen bereit. Sie besitzt keine grafische Oberf
 
 | Job | Aufgabe | Trigger / Bedingung | Abhängigkeit | Environment | Artifact |
 |---|---|---|---|---|---|
-| `test` | Python einrichten, Cache nutzen, Abhängigkeiten installieren, Tests ausführen, ZIP erstellen und hochladen | Push und Pull Request | Keine | Keines | Erzeugt `temperatur-konverter-paket` |
-| `deploy` | Artifact herunterladen, Paket und Konfiguration prüfen, Release erstellen | Nur Push auf `main`; erfolgreiche Tests und Environment-Freigabe erforderlich | `test` | `production` | Verwendet `temperatur-konverter-paket` |
+| test | Python einrichten, Cache nutzen, Abhängigkeiten installieren und Tests ausführen | Push und Pull Request | Keine | Keines | Keines |
+| build | Anwendung paketieren und Artifact hochladen | Nach erfolgreichen Tests | test | Keines | Erzeugt temperatur-konverter-paket |
+| deploy | Artifact herunterladen und Release veröffentlichen | Nur Push auf main, nach erfolgreichem Build und Freigabe | build | production | Verwendet temperatur-konverter-paket |
 
 Der Workflow verwendet Python 3.12. Die Version wird zentral über `PYTHON_VERSION` festgelegt.
 
@@ -34,7 +35,7 @@ Das ZIP wird einmal im Test-Job gebaut. Der Deployment-Job übernimmt dieses Erg
 
 Der Workflow startet bei Push und Pull Request.
 
-Auf Arbeitsbranches und bei Pull Requests wird das Deployment übersprungen. Bei fehlgeschlagenen Tests werden die nachfolgenden Build- und Upload-Steps sowie der Deployment-Job übersprungen.
+Auf Arbeitsbranches und bei Pull Requests wird das Deployment übersprungen. Bei fehlgeschlagenen Tests werden der Build-Job und anschließend der Deployment-Job übersprungen.
 
 Das Environment `production` verlangt eine manuelle Freigabe und erlaubt Deployments ausschließlich vom Branch `main`.
 
