@@ -38,19 +38,35 @@ jobs:
       - name: Tests ausführen
         run: python -m pytest -v
 
+  build:
+    name: Anwendung bauen
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository-Code holen
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
       - name: Anwendung paketieren
         run: |
           mkdir -p build
           python -m zipfile -c build/temperatur-konverter.zip src/ README.md requirements.txt
+
       - name: Anwendungspaket hochladen
         uses: actions/upload-artifact@v4
         with:
           name: temperatur-konverter-paket
           path: build/temperatur-konverter.zip
           if-no-files-found: error
+
   deploy:
     name: Geschütztes Deployment vorbereiten
-    needs: test
+    needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
